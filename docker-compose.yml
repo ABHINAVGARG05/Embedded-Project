@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mqtt-broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  backend:
+    build: ./backend
+    depends_on:
+      - mosquitto
+    environment:
+      - MQTT_BROKER=tcp://mosquitto:1883
