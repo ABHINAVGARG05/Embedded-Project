@@ -4,14 +4,16 @@ from pathlib import Path
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-WINDOW_SIZE   = 200          
-STEP_SIZE     = 100         
-CHANNELS      = 3         
-SAMPLING_RATE = 200          
+# ── Constants ──────────────────────────────────────────────────────────────────
+WINDOW_SIZE   = 200
+STEP_SIZE     = 100
+CHANNELS      = 3
+SAMPLING_RATE = 200
 
-ACC_SCALE  = (8 * 2 / 65536) * 9.8  
-GYRO_SCALE = (2000 * 2 / 65536)      
+ACC_SCALE  = (8 * 2 / 65536) * 9.8
+GYRO_SCALE = (2000 * 2 / 65536)
 
+FALL_CODES = {f"F{i:02d}" for i in range(1, 16)}
 def parse_sisfall_file(filepath: str) -> np.ndarray:
     """
     Parse a single SisFall .txt file into a float32 array.
