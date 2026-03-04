@@ -21,7 +21,11 @@ func SensorHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonData, err := json.Marshal(batch)
+	jsonData, err := json.Marshal(struct {
+		Acc [][]float64 `json:"acc"`
+	}{
+		Acc: batch.Acc,
+	})
 	if err != nil {
 		http.Error(w, "JSON Marshalling Error", http.StatusInternalServerError)
 		return
