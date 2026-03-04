@@ -54,7 +54,7 @@ test_loader  = DataLoader(test_dataset,  batch_size=BATCH_SIZE, shuffle=False)
 model = FallCNN(in_channels=CHANNELS, window_size=WINDOW_SIZE).to(DEVICE)
 criterion = nn.BCELoss()
 optimizer = optim.Adam(model.parameters(), lr=LR, weight_decay=1e-4)
-scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3, factor=0.5, verbose=True)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3, factor=0.5)
 
 total_params = sum(p.numel() for p in model.parameters())
 print(f"\nModel parameters: {total_params:,}")
