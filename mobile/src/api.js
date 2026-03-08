@@ -1,8 +1,8 @@
-import axios from 'axios';
+import axios from "axios";
 
 // The default backend port is 8080 based on the analysis
 // This will be configurable in the UI
-let backendUrl = 'http://192.168.1.100:8080'; 
+let backendUrl = "http://192.168.1.100:8080";
 
 export const setBackendUrl = (url) => {
   backendUrl = url;
@@ -19,7 +19,7 @@ export const sendSensorData = async (deviceId, accData, gyroData) => {
     });
     return response.data;
   } catch (error) {
-    console.error('API Error:', error.message);
+    console.error("API Error:", error.message);
     throw error;
   }
 };
@@ -32,7 +32,7 @@ export const registerPushToken = async (deviceId, expoToken) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Push registration error:', error.message);
+    console.error("Push registration error:", error.message);
     throw error;
   }
 };

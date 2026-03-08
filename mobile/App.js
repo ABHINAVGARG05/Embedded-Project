@@ -1,20 +1,32 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, TextInput, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
-import { Accelerometer, Gyroscope } from 'expo-sensors';
-import * as Notifications from 'expo-notifications';
-import { setBackendUrl, getBackendUrl, sendSensorData, registerPushToken } from './src/api';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  SafeAreaView,
+  Alert,
+} from "react-native";
+import { Accelerometer, Gyroscope } from "expo-sensors";
+import * as Notifications from "expo-notifications";
+import {
+  setBackendUrl,
+  getBackendUrl,
+  sendSensorData,
+  registerPushToken,
+} from "./src/api";
 
 const BATCH_SIZE = 20;
 
 export default function App() {
-  const [deviceId, setDeviceId] = useState('mobile-user-1');
+  const [deviceId, setDeviceId] = useState("mobile-user-1");
   const [serverUrl, setServerUrl] = useState(getBackendUrl());
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [fallDetected, setFallDetected] = useState(false);
   const [accData, setAccData] = useState({ x: 0, y: 0, z: 0 });
   const [gyroData, setGyroData] = useState({ x: 0, y: 0, z: 0 });
-  const [status, setStatus] = useState('Idle');
-  const [pushToken, setPushToken] = useState('');
+  const [status, setStatus] = useState("Idle");
+  const [pushToken, setPushToken] = useState("");
 
   const subscriptionRef = useRef(null);
   const gyroSubscriptionRef = useRef(null);
@@ -29,13 +41,13 @@ export default function App() {
 
   const startMonitoring = async () => {
     if (!serverUrl || !deviceId) {
-      Alert.alert('Error', 'Please enter Device ID and Backend URL');
+      Alert.alert("Error", "Please enter Device ID and Backend URL");
       return;
     }
 
     setBackendUrl(serverUrl);
     setFallDetected(false);
-    setStatus('Monitoring... Starting sensors');
+    setStatus("Monitoring... Starting sensors");
     setIsMonitoring(true);
     dataBatchRef.current = { acc: [], gyro: [] };
 
@@ -43,7 +55,7 @@ export default function App() {
       try {
         await registerPushToken(deviceId, pushToken);
       } catch (error) {
-        console.warn('Push registration failed:', error);
+        console.warn("Push registration failed:", error);
       }
     }
 
@@ -51,9 +63,11 @@ export default function App() {
     Accelerometer.setUpdateInterval(50);
     Gyroscope.setUpdateInterval(50);
 
-    subscriptionRef.current = Accelerometer.addListener(processAccelerometerData);
+    subscriptionRef.current = Accelerometer.addListener(
+      processAccelerometerData,
+    );
     gyroSubscriptionRef.current = Gyroscope.addListener(processGyroscopeData);
-    setStatus('Monitoring Active');
+    setStatus("Monitoring Active");
   };
 
   const stopMonitoring = () => {
@@ -66,7 +80,7 @@ export default function App() {
       gyroSubscriptionRef.current = null;
     }
     setIsMonitoring(false);
-    setStatus('Idle');
+    setStatus("Idle");
     dataBatchRef.current = { acc: [], gyro: [] };
   };
 
@@ -92,26 +106,27 @@ export default function App() {
     try {
       // Small UI update to show activity without disrupting the main state
       const response = await sendSensorData(deviceId, accBatch, gyroBatch);
-      
+
       if (response && response.fall) {
         handleFallDetection();
       }
     } catch (error) {
-      setStatus('Error connecting to backend');
+      setStatus("Error connecting to backend");
       console.warn("Backend Error:", error);
     }
   };
 
   const registerForPushNotifications = async () => {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
 
-    if (existingStatus !== 'granted') {
+    if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
 
-    if (finalStatus !== 'granted') {
+    if (finalStatus !== "granted") {
       return;
     }
 
@@ -121,7 +136,7 @@ export default function App() {
 
   const handleFallDetection = () => {
     setFallDetected(true);
-    setStatus('Fall Detected!');
+    setStatus("Fall Detected!");
     stopMonitoring();
   };
 
@@ -137,18 +152,31 @@ export default function App() {
     <SafeAreaView className="flex-1 bg-neutral-100 justify-center items-center">
       {fallDetected ? (
         <View className="w-11/12 bg-red-500 rounded-2xl p-6 shadow-md items-center">
-          <Text className="text-3xl font-bold text-white mb-3 text-center">⚠️ FALL DETECTED ⚠️</Text>
-          <Text className="text-lg text-white mb-8">Assistance may be needed.</Text>
-          <TouchableOpacity className="bg-white px-8 py-4 rounded-full" onPress={() => setFallDetected(false)}>
-            <Text className="text-red-500 text-base font-bold">Reset Status</Text>
+          <Text className="text-3xl font-bold text-white mb-3 text-center">
+            ⚠️ FALL DETECTED ⚠️
+          </Text>
+          <Text className="text-lg text-white mb-8">
+            Assistance may be needed.
+          </Text>
+          <TouchableOpacity
+            className="bg-white px-8 py-4 rounded-full"
+            onPress={() => setFallDetected(false)}
+          >
+            <Text className="text-red-500 text-base font-bold">
+              Reset Status
+            </Text>
           </TouchableOpacity>
         </View>
       ) : (
         <View className="w-11/12 bg-white rounded-2xl p-6 shadow-md">
-          <Text className="text-2xl font-bold mb-5 text-center text-neutral-800">Fall Detection Monitor</Text>
-          
+          <Text className="text-2xl font-bold mb-5 text-center text-neutral-800">
+            Fall Detection Monitor
+          </Text>
+
           <View className="mb-4">
-            <Text className="text-sm font-semibold text-neutral-600 mb-1.5">Device ID</Text>
+            <Text className="text-sm font-semibold text-neutral-600 mb-1.5">
+              Device ID
+            </Text>
             <TextInput
               className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50"
               value={deviceId}
@@ -159,7 +187,9 @@ export default function App() {
           </View>
 
           <View className="mb-4">
-            <Text className="text-sm font-semibold text-neutral-600 mb-1.5">Backend URL</Text>
+            <Text className="text-sm font-semibold text-neutral-600 mb-1.5">
+              Backend URL
+            </Text>
             <TextInput
               className="border border-neutral-300 rounded-lg p-3 text-base bg-neutral-50"
               value={serverUrl}
@@ -172,27 +202,45 @@ export default function App() {
           </View>
 
           <View className="bg-neutral-50 p-4 rounded-lg mb-5 border border-neutral-200">
-            <Text className="text-sm font-semibold text-neutral-600 mb-1.5">Accelerometer Live Data:</Text>
-            <Text className="font-mono text-base text-neutral-800 my-0.5">X: {accData.x.toFixed(3)}</Text>
-            <Text className="font-mono text-base text-neutral-800 my-0.5">Y: {accData.y.toFixed(3)}</Text>
-            <Text className="font-mono text-base text-neutral-800 my-0.5">Z: {accData.z.toFixed(3)}</Text>
+            <Text className="text-sm font-semibold text-neutral-600 mb-1.5">
+              Accelerometer Live Data:
+            </Text>
+            <Text className="font-mono text-base text-neutral-800 my-0.5">
+              X: {accData.x.toFixed(3)}
+            </Text>
+            <Text className="font-mono text-base text-neutral-800 my-0.5">
+              Y: {accData.y.toFixed(3)}
+            </Text>
+            <Text className="font-mono text-base text-neutral-800 my-0.5">
+              Z: {accData.z.toFixed(3)}
+            </Text>
           </View>
 
           <View className="bg-neutral-50 p-4 rounded-lg mb-5 border border-neutral-200">
-            <Text className="text-sm font-semibold text-neutral-600 mb-1.5">Gyroscope Live Data:</Text>
-            <Text className="font-mono text-base text-neutral-800 my-0.5">X: {gyroData.x.toFixed(3)}</Text>
-            <Text className="font-mono text-base text-neutral-800 my-0.5">Y: {gyroData.y.toFixed(3)}</Text>
-            <Text className="font-mono text-base text-neutral-800 my-0.5">Z: {gyroData.z.toFixed(3)}</Text>
+            <Text className="text-sm font-semibold text-neutral-600 mb-1.5">
+              Gyroscope Live Data:
+            </Text>
+            <Text className="font-mono text-base text-neutral-800 my-0.5">
+              X: {gyroData.x.toFixed(3)}
+            </Text>
+            <Text className="font-mono text-base text-neutral-800 my-0.5">
+              Y: {gyroData.y.toFixed(3)}
+            </Text>
+            <Text className="font-mono text-base text-neutral-800 my-0.5">
+              Z: {gyroData.z.toFixed(3)}
+            </Text>
           </View>
 
-          <Text className="text-sm text-neutral-600 text-center mb-5 italic">Status: {status}</Text>
+          <Text className="text-sm text-neutral-600 text-center mb-5 italic">
+            Status: {status}
+          </Text>
 
-          <TouchableOpacity 
-            className={`p-4 rounded-lg items-center ${isMonitoring ? 'bg-red-500' : 'bg-green-500'}`} 
+          <TouchableOpacity
+            className={`p-4 rounded-lg items-center ${isMonitoring ? "bg-red-500" : "bg-green-500"}`}
             onPress={toggleMonitoring}
           >
             <Text className="text-white text-base font-bold">
-              {isMonitoring ? 'Stop Monitoring' : 'Start Monitoring'}
+              {isMonitoring ? "Stop Monitoring" : "Start Monitoring"}
             </Text>
           </TouchableOpacity>
         </View>
