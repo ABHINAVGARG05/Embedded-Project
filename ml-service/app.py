@@ -41,12 +41,14 @@ def predict(data: SensorWindow):
         )
 
     features = np.concatenate([acc, gyro], axis=1)
-    features_norm = scaler.transform(features)
-
+    #features_norm = scaler.transform(features)
+    features_norm = features
     tensor = torch.tensor(features_norm.T[np.newaxis], dtype=torch.float32).to(DEVICE)
 
     with torch.no_grad():
         prob = model(tensor).item()
+    
+    print("Prediction probability:", prob)
 
     return {
         "fall":       prob >= THRESHOLD,

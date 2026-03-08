@@ -7,5 +7,6 @@ type SensorBatch struct {
 }
 
 type MLResponse struct {
-	Fall bool `json:"fall"`
+	Fall       bool    `json:"fall"`
+	Confidence float64 `json:"confidence"`
 }
