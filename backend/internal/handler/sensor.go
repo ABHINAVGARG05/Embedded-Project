@@ -22,9 +22,11 @@ func SensorHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonData, err := json.Marshal(struct {
-		Acc [][]float64 `json:"acc"`
+		Acc  [][]float64 `json:"acc"`
+		Gyro [][]float64 `json:"gyro"`
 	}{
-		Acc: batch.Acc,
+		Acc:  batch.Acc,
+		Gyro: batch.Gyro,
 	})
 	if err != nil {
 		http.Error(w, "JSON Marshalling Error", http.StatusInternalServerError)
@@ -58,6 +60,10 @@ func SensorHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Invalid ML Response", http.StatusInternalServerError)
 		return
+	}
+
+	if result.Fall {
+		_ = sendFallNotification(batch.DeviceID)
 	}
 
 	w.Header().Set("Content-Type", "application/json")

@@ -8,7 +8,7 @@ import joblib
 
 WINDOW_SIZE   = 200
 STEP_SIZE     = 100
-CHANNELS      = 3
+CHANNELS      = 6
 SAMPLING_RATE = 200
 
 ACC_SCALE  = (8 * 2 / 65536) * 9.8
